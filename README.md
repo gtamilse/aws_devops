@@ -1,4 +1,4 @@
-# Simple Application utilizing AWS DevOps Tools
+# AWS DEVOPS Tools - Simple Application
 
 ## Overview
 - Create and update a simple Web Application on AWS EC2

@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - cd python-project && pip install -r requirements.txt
+      - pip install pycodestyle
+  build:
+    commands:
+      - pycodestyle -v src/*.py
+      - echo "pycodestyle found no issues!"
+      - python -m pytest
+artifacts:
+  files:
+    - src/*
+  discard-paths: yes
+  base-directory: python-project
+  name: python-webapp-$(date +%Y-%m-%d-%H-%M).zip
+
