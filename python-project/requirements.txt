@@ -1,0 +1,9 @@
+flake8
+pylint
+pytest
+bandit
+autopep8
+isort==5.8.0
+black
+coverage
+yamllint
