@@ -6,117 +6,114 @@
 
     <body>
         <h1> AWS DevOps Steps Overview</h1>
-        <p style="margin: 0in; margin-left: .375in; font-family: Calibri; font-size: 11.0pt;">SCM - Github</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">Load files into github</p>
-        <p style="margin: 0in; margin-left: .375in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .375in; font-family: Calibri; font-size: 11.0pt;">CodeDeploy</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">Application -&gt; create application</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; name - app name</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; compute platform - Amazon EC2/On-prem</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">Deployment Group (target to which instance to deploy the application too)</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Before creating a DG you need to have an EC2 instance up and running</span></li>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="square">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Spin EC2 instance -&gt; AMI Linux 2 AMI (HVM) - t2.micro </span></li>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">IAM Role -&gt; attach a role (EC2 code deploy)</span></li>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Create IAM role -&gt; permission -&gt; amazonec2roleforcodedeploy</span></li>
-        </ul>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">User Data as text -&gt; enter code for codedeploy agent in redhat<br /></span></li>
-        </ul>
-        </ul>
-        </ul>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
+        <p>&nbsp;</p>
+        <p style="color: #180af4;"><strong>Step 1) Create project files in SCM - Github/CodeCommit</strong></p>
+        <p style="color: #180af4;"><strong>Step 2) Login to AWS Account and select Region to deploy project</strong></p>
+        <p style="color: #180af4;"><strong>Step 3) Create IAM Service Role to allow interaction between EC2, CodeDeploy, and S3 </strong></p>
+        <p>&nbsp;&nbsp;&nbsp; IAM -&gt; Create Role -&gt; AWS Service - Code Deploy -&gt; Usecase - Codeploy (if using with EC2)</p>
         <ul>
+        <li>Provide Permissions: AWSCodeDeployRole &amp; AmazonS3FullAccess (need S3 access to copy files into EC2)</li>
+        <li>Tags: (Optional)</li>
+        <li>Review -&gt; Role Name: ec2-codedeploy-role</li>
+        <li>Create Role and then edit trust relationships on the role</li>
+        </ul>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "Service": [</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;"ec2.amazonaws.com",</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "codedeploy.amazonaws.com"</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;]</span></p>
+        <p>&nbsp;</p>
+        <p><strong style="color: #180af4;">Step 4) Deploy EC2 Instance</strong></p>
+        <p>&nbsp;&nbsp;&nbsp; EC2 -&gt; Instance -&gt; Launch Instance</p>
         <ul>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Add tag &gt; key - Name , Value - webserver (need tag for codedeploy)</span></li>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Add security group -&gt; allow SSH and HTTP <br /></span></li>
+        <li>Name: webserver</li>
+        <li>IAM Role: attach a role (EC2 code deploy)</li>
+        <li>Add User Data as text, enter code to install codedeploy agent (RHEL code shown below)</li>
+        <li>Add Security Group to allow ssh and HTTP traffic</li>
         </ul>
-        </ul>
-        </ul>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Once EC2 instance is up we can create the DG</span></li>
+        <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; REDHAT</p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #!/bin/bash -xe</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; yum update -y</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; yum install httpd -y</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; service httpd start</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; yum install -y ruby</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cd /opt</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; curl -O https://aws-codedeploy-us-east-2.s3.us-east-2.amazonaws.com/latest/install</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; chmod +x ./install</span></p>
+        <p><span style="font-family: courier new, courier;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ./install auto</span></p>
+        <p>&nbsp;</p>
+        <p><strong style="color: #180af4;">Step 5) Create Application on CodeDeploy </strong></p>
+        <p>&nbsp;&nbsp;&nbsp; CodeDeploy -&gt; Application -&gt; create application</p>
+        <ul>
+        <li>name: app name</li>
+        <li>compute platform: Amazon EC2/On-prem</li>
         </ul>
         <p>&nbsp;</p>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Create Codedeploy Deployment Group </span></li>
-        </ul>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; Deployment group name - webserver-dpeloy</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; Service role -&gt; iam role created earlier for codedeploy-role1</p>
-        <blockquote>
-        <blockquote>
-        <blockquote>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">IAM create role</span></li>
-        </ul>
-        </blockquote>
-        </blockquote>
-        </blockquote>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; Deployment Type - In-Place</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; Env configuration - AWS EC2 Instance</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">Name - WebServer (from the tag on EC2 instance)</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; Deployment Settings - CodeDeploy One at a time</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; Loadbalance -&gt; uncheck enable load balancing since we are not using a LB</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; Create Deployment Group</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">Use codepipeline to trigger the deployment instead of triggering from codedeploy every time</p>
-        <p style="margin: 0in; margin-left: .375in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .375in; font-family: Calibri; font-size: 11.0pt;">CodePipeline - setup the pipeline</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">SCM (github) Connect</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">CodePipeline -&gt; Create a new pipeline</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">-&gt; Pipeline name - webserver</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">-&gt; Service Role - create new service role</p>
-        <p style="margin: 0in; margin-left: 1.875in; font-family: Calibri; font-size: 11.0pt;">Check - allow aws code pipeline to create a service role to use with pipeline</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">-&gt; Advanced settings</p>
-        <blockquote>
-        <blockquote>
-        <blockquote>
-        <blockquote>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Artifact store - Default location (creates a S3 bucket)</span></li>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Encryption Key - Default AWS Managed Key</span></li>
-        </ul>
-        </blockquote>
-        </blockquote>
-        </blockquote>
-        </blockquote>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">-&gt; Add Source Provider</p>
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
-        <ul style="direction: ltr; unicode-bidi: embed; margin-top: 0in; margin-bottom: 0in;" type="disc">
+        <p><strong style="color: #180af4;">Step 6) Create Deployment Group on CodeDeploy (target instance to deploy the application)</strong></p>
+        <p>&nbsp;&nbsp;&nbsp; Codedeploy -&gt; Application -&gt; &lt;app&gt; -&gt; Create Deployment Group</p>
         <ul>
+        <li>Deployment group name: webserver-dpeloy</li>
+        <li>Service role: iam role created earlier for codedeploy-role1</li>
+        <li>Deployment Type: In-Place (if just updating the app)</li>
+        <li>Env configuration: AWS EC2 Instance
         <ul>
+        <li>Name: webServer (from the tag on EC2 instance)</li>
+        <li>Deployment Settings: CodeDeploy One at a time</li>
+        <li>Loadbalancer: uncheck enable load balancing since we are not using a LB</li>
+        <li>Create Deployment Group</li>
+        </ul>
+        </li>
+        </ul>
+        <p>&nbsp;&nbsp;&nbsp; Use codepipeline to trigger the deployment instead of triggering from codedeploy every time</p>
+        <p>&nbsp;</p>
+        <p><strong style="color: #180af4;">Step 7) Create CodePipeline </strong></p>
+        <p>&nbsp;&nbsp;&nbsp; CodePipeline -&gt; Pipelines -&gt; Create Pipeline</p>
+        <p style="color: #f2840c;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Stage 1 - Pipeline Settings</p>
         <ul>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Source provider - Github</span></li>
+        <li>Pipeline Name: &lt;app_pipeline&gt;</li>
+        <li>Service Role: Create new service role
         <ul>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Connect to Github -&gt; using webhook </span></li>
+        <li>Check allow aws code pipeline to create a service role to use with pipeline</li>
+        <li>Advanced settings
+        <ul>
+        <li>Artifact store: Default location (creates a S3 bucket)</li>
+        <li>Encryption Key: Default AWS Managed Key</li>
         </ul>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Repository -&gt; github repo name</span></li>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Branch -&gt; github repo branch</span></li>
-        <li style="margin-top: 0; margin-bottom: 0; vertical-align: middle;"><span style="font-family: Calibri; font-size: 11.0pt;">Change Detect Options -&gt; Github webhooks </span></li>
+        </li>
         </ul>
+        </li>
         </ul>
+        <p>&nbsp;</p>
+        <p style="color: #f2840c;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Stage 2 - Add Source Stage</p>
+        <ul>
+        <li>Source provider: Github
+        <ul>
+        <li>Connect to Github -&gt; using webhook)</li>
+        <li>Repository: github repo name</li>
+        <li>Branch: github repo branch</li>
+        <li>Change Detect Options: Github webhooks</li>
         </ul>
+        </li>
         </ul>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <p style="color: #f2840c;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Stage 3 - Add Build Stage</p>
+        <ul>
+        <li>CodeBuild: optional, skip if there is nothing to build</li>
         </ul>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">Build Stage</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">CodeBuild -&gt; optional if there is nothing to build</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">Deploy Stage</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">Deploy Provider -&gt; AWS CodeDeply</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">-&gt; Region - same as codedeploy</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">-&gt; App name - select codedeploy app name</p>
-        <p style="margin: 0in; margin-left: 1.5in; font-family: Calibri; font-size: 11.0pt;">-&gt; DG - select DG group created earlier</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">&nbsp;</p>
-        <p style="margin: 0in; margin-left: .75in; font-family: Calibri; font-size: 11.0pt;">Review and Create Pipeline</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; this will trigger the pipeline run</p>
-        <p style="margin: 0in; margin-left: 1.125in; font-family: Calibri; font-size: 11.0pt;">-&gt; check ip of ec2 to see if webserver is running</p>
+        <p>&nbsp;</p>
+        <p style="color: #f2840c;">&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;Stage 4 - Add Deploy Stage</p>
+        <ul>
+        <li>Deploy Provider: AWS CodeDeply</li>
+        <li>Region: same as codedeploy</li>
+        <li>App nam: select codedeploy app name</li>
+        <li>Deployment Group: select DG group created earlier</li>
+        </ul>
+        <p>&nbsp;</p>
+        <p style="color: #f2840c;">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;Stage 5 - Review and Create Pipeline</p>
+        <ul>
+        <li>This will trigger the pipeline run</li>
+        <li>Check IP of ec2 to see if webserver is running</li>
+        </ul>
+        <p>&nbsp;</p>
     </body>
 </html>
