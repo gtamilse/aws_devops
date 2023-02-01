@@ -1,9 +1,11 @@
 #!/bin/bash -xe
+yum update -y
+
+yum install httpd -y
+service httpd start
 yum install -y ruby
 
 cd /opt
-curl -O https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
-
+curl -O https://aws-codedeploy-us-east-2.s3.us-east-2.amazonaws.com/latest/install
 chmod +x ./install
 ./install auto
-
